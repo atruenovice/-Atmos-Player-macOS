@@ -1,0 +1,82 @@
+brotli | 1.2.1 | MIT
+ca-certificates | 2026-11-05 | MPL-2.0
+cairo | 1.18.6 | LGPL-2.1-only OR MPL-1.1
+certifi | 2026.10.23 | MPL-2.0
+cffi | 2.1.1 | MIT-0
+curl-impersonate | 2.3.2 | MIT AND Apache-2.0 AND BSD-3-Clause AND curl AND Zlib AND (GPL-2.0-or-later OR LGPL-3.0-or-later) AND (Unicode-TOU AND Unicode-DFS-2016)
+dav1d | 1.5.5 | BSD-2-Clause
+deno | 2.9.8 | MIT
+dylibbundler | 1.0.5 | MIT
+ffmpeg | 9.0.2 | GPL-3.0-or-later
+flac | 1.5.0 | BSD-3-Clause AND GPL-2.0-or-later AND ISC AND LGPL-2.0-or-later AND LGPL-2.1-or-later AND LicenseRef-Homebrew-public-domain AND (GPL-2.0-or-later OR LGPL-2.1-or-later)
+fontconfig | 2.18.3 | HPND-sell-variant AND Unicode-3.0 AND MIT-Modern-Variant AND MIT AND LicenseRef-Homebrew-public-domain
+freetype | 2.15.0 | FTL
+fribidi | 1.0.18 | GPL-2.0-or-later AND LGPL-2.1-or-later
+gettext | 1.0 | GPL-3.0-or-later AND LGPL-2.1-or-later
+giflib | 6.1.3 | MIT
+glib | 2.90.1 | LGPL-2.1-or-later
+graphite2 | 1.3.15 | MIT OR MPL-2.0 OR LGPL-2.1-or-later OR GPL-2.0-or-later
+harfbuzz | 15.1.0 | MIT
+icu4c@79 | 79.1 | Unicode-3.0
+jpeg-turbo | 3.2.1 | IJG AND Zlib AND BSD-3-Clause
+json-c | 0.19 | MIT
+lame | 4.0 | LGPL-2.0-or-later
+libarchive | 3.8.11 | BSD-2-Clause
+libass | 0.17.5 | ISC
+libb2 | 0.98.1 | CC0-1.0
+libbluray | 1.5.0 | LGPL-2.1-or-later
+libogg | 1.3.6 | BSD-3-Clause
+libplacebo | 7.387.0 | LGPL-2.1-or-later
+libpng | 1.6.59 | libpng-2.0
+libsamplerate | 0.2.2 | BSD-2-Clause
+libsndfile | 1.2.2 | LGPL-2.1-or-later
+libtiff | 4.7.2 | libtiff
+libudfread | 1.2.0 | LGPL-2.1-or-later
+libunibreak | 8.0.1 | Zlib
+libunistring | 1.5 | GPL-2.0-or-later OR LGPL-3.0-or-later
+libvmaf | 3.2.1 | BSD-2-Clause-Patent
+libvorbis | 1.3.7 | BSD-3-Clause
+libvpx | 1.17.0 | BSD-3-Clause
+libx11 | 1.8.14 | MIT
+libxau | 1.0.12 | MIT
+libxcb | 1.17.0 | MIT
+libxdmcp | 1.1.5 | MIT
+libxext | 1.3.7 | MIT
+libxrender | 0.9.13 | MIT
+little-cms2 | 2.20 | MIT
+luajit | 2.1.1794386141 | MIT
+lz4 | 1.11.1 | BSD-2-Clause
+lzo | 2.10 | GPL-2.0-or-later
+meson | 1.12.1 | Apache-2.0
+molten-vk | 1.4.2 | Apache-2.0
+mpdecimal | 4.0.1 | BSD-2-Clause
+mpg123 | 1.33.7 | LGPL-2.1-only
+mpv | 0.42.0 | GPL-2.0-or-later AND LGPL-2.1-or-later
+mujs | 1.3.11 | ISC
+ninja | 1.13.2 | Apache-2.0
+openssl@4 | 4.1.0 | Apache-2.0
+opus | 1.6.1 | BSD-3-Clause
+pcre2 | 10.49 | BSD-3-Clause
+pixman | 0.46.4 | MIT
+pkgconf | 3.0.11 | ISC
+pycparser | 3.12 | BSD-3-Clause
+python@3.15 | 3.15.2 | Python-2.0
+readline | 8.3.6 | GPL-3.0-or-later
+rubberband | 4.0.0 | GPL-2.0-or-later
+sdl2-compat | 2.32.74 | Zlib
+sdl3 | 3.4.20 | Zlib
+shaderc | 2026.4 | Apache-2.0
+sqlite | 3.54.1 | blessing
+svt-av1 | 4.3.0 | BSD-3-Clause
+uchardet | 0.0.8 | MPL-1.1 OR GPL-2.0-or-later OR LGPL-2.1-or-later
+vapoursynth | 82 | LGPL-2.1-or-later
+vulkan-headers | 1.4.363.0 | Apache-2.0
+vulkan-loader | 1.4.363.0 | Apache-2.0
+webp | 1.6.0 | BSD-3-Clause
+x264 | r3222 | GPL-2.0-or-later
+x265 | 4.3 | GPL-2.0-or-later
+xorgproto | 2026.1 | MIT
+xz | 5.8.4 | 0BSD AND GPL-2.0-or-later
+yt-dlp | 2026.10.26 | Unlicense
+zimg | 3.0.6 | WTFPL
+zstd | 1.5.7 | (BSD-3-Clause OR GPL-2.0-only) AND BSD-2-Clause AND MIT

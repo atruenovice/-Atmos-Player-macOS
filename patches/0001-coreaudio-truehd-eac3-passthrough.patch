@@ -1,0 +1,149 @@
+From 59b3763c1072415112a7dcc7c88c84684a83cae3 Mon Sep 17 00:00:00 2001
+From: Riccardo Di Clemente <riccardo.diclemente@nulondon.ac.uk>
+Date: Tue, 10 Nov 2026 11:30:38 +0000
+Subject: [PATCH] ao_coreaudio: add support for E-AC-3 and TrueHD compressed
+ formats
+
+macOS CoreAudio exposes compressed bitstream formats over HDMI using
+FourCC values not defined in the public Apple SDK headers:
+- 'cc+3': E-AC-3 / Dolby Digital Plus (including Dolby Atmos)
+- 'mtc+': Dolby TrueHD / MAT 2.0 (including Dolby Atmos)
+
+For bitstream passthrough over HDMI, CoreAudio expects an IEC 60958
+frame rate of (samplerate * num_channels / 2) with 2 channels.
+For TrueHD (8ch @ 192 kHz), this translates to 768 kHz on the physical
+stream, while E-AC-3 runs at 192 kHz.
+
+Add support for these formats in ao_coreaudio:
+- Define CA_FORMAT_EAC3 and CA_FORMAT_TRUEHD and handle them in
+  ca_fill_asbd_raw() with dynamic IEC 60958 carrier rate calculation.
+- Mark them as compressed in ca_formatid_is_compressed().
+- In ao_coreaudio_exclusive, derive ao->samplerate by reversing the
+  IEC 60958 carrier rate, and skip PCM channel map initialization
+  for compressed formats.
+---
+ audio/out/ao_coreaudio_exclusive.c | 19 +++++++++----
+ audio/out/ao_coreaudio_utils.c     | 45 ++++++++++++++++++++++++------
+ 2 files changed, 49 insertions(+), 15 deletions(-)
+
+diff --git a/audio/out/ao_coreaudio_exclusive.c b/audio/out/ao_coreaudio_exclusive.c
+index 6dac7c0c04..6f6def53d2 100644
+--- a/audio/out/ao_coreaudio_exclusive.c
++++ b/audio/out/ao_coreaudio_exclusive.c
+@@ -337,8 +337,10 @@ static int init(struct ao *ao)
+     // virtual format.
+     ca_change_physical_format_sync(ao, p->stream, hwfmt);
+ 
+-    if (!ca_init_chmap(ao, p->device))
+-        goto coreaudio_error;
++    if (!af_fmt_is_spdif(ao->format)) {
++        if (!ca_init_chmap(ao, p->device))
++            goto coreaudio_error;
++    }
+ 
+     err = CA_GET(p->stream, kAudioStreamPropertyVirtualFormat, &p->stream_asbd);
+     CHECK_CA_ERROR("could not get stream's virtual format");
+@@ -363,11 +365,16 @@ static int init(struct ao *ao)
+         goto coreaudio_error;
+     }
+ 
+-    ao->samplerate = p->stream_asbd.mSampleRate;
++    if (af_fmt_is_spdif(ao->format)) {
++        ao->samplerate = p->stream_asbd.mSampleRate *
++                         p->stream_asbd.mChannelsPerFrame / ao->channels.num;
++    } else {
++        ao->samplerate = p->stream_asbd.mSampleRate;
+ 
+-    if (ao->channels.num != p->stream_asbd.mChannelsPerFrame) {
+-        ca_get_active_chmap(ao, p->device, p->stream_asbd.mChannelsPerFrame,
+-                            &ao->channels);
++        if (ao->channels.num != p->stream_asbd.mChannelsPerFrame) {
++            ca_get_active_chmap(ao, p->device, p->stream_asbd.mChannelsPerFrame,
++                                &ao->channels);
++        }
+     }
+     if (!ao->channels.num) {
+         MP_ERR(ao, "number of channels changed, and unknown channel layout!\n");
+diff --git a/audio/out/ao_coreaudio_utils.c b/audio/out/ao_coreaudio_utils.c
+index 8ff76a8025..d5b18b59fc 100644
+--- a/audio/out/ao_coreaudio_utils.c
++++ b/audio/out/ao_coreaudio_utils.c
+@@ -144,19 +144,35 @@ bool check_ca_st(struct ao *ao, int level, OSStatus code, const char *message)
+     return false;
+ }
+ 
++// Compressed stream format FourCCs exposed by macOS HDMI drivers.
++// Not present in Apple SDK headers.
++#define CA_FORMAT_EAC3            'cc+3' // E-AC-3 / Dolby Digital Plus
++#define CA_FORMAT_TRUEHD          'mtc+' // Dolby TrueHD / MAT 2.0
++
+ static void ca_fill_asbd_raw(AudioStreamBasicDescription *asbd, int mp_format,
+                              int samplerate, int num_channels)
+ {
+     asbd->mSampleRate       = samplerate;
+-    // Set "AC3" for other spdif formats too - unknown if that works.
+-    asbd->mFormatID         = af_fmt_is_spdif(mp_format) ?
+-                              kAudioFormat60958AC3 :
+-                              kAudioFormatLinearPCM;
+-    asbd->mChannelsPerFrame = num_channels;
++    if (af_fmt_is_spdif(mp_format)) {
++        // CoreAudio expects the IEC60958 frame rate (samplerate * num_channels / 2)
++        asbd->mSampleRate       = (double)samplerate * num_channels / 2;
++        asbd->mChannelsPerFrame = 2;
++
++        if (mp_format == AF_FORMAT_S_TRUEHD) {
++            asbd->mFormatID     = CA_FORMAT_TRUEHD;
++        } else if (mp_format == AF_FORMAT_S_EAC3) {
++            asbd->mFormatID     = CA_FORMAT_EAC3;
++        } else {
++            asbd->mFormatID     = kAudioFormat60958AC3;
++        }
++    } else {
++        asbd->mFormatID         = kAudioFormatLinearPCM;
++        asbd->mChannelsPerFrame = num_channels;
++    }
+     asbd->mBitsPerChannel   = af_fmt_to_bytes(mp_format) * 8;
+     asbd->mFormatFlags      = kAudioFormatFlagIsPacked;
+ 
+-    int channels_per_buffer = num_channels;
++    int channels_per_buffer = asbd->mChannelsPerFrame;
+     if (af_fmt_is_planar(mp_format)) {
+         asbd->mFormatFlags |= kAudioFormatFlagIsNonInterleaved;
+         channels_per_buffer = 1;
+@@ -184,19 +200,30 @@ void ca_fill_asbd(struct ao *ao, AudioStreamBasicDescription *asbd)
+ 
+ bool ca_formatid_is_compressed(uint32_t formatid)
+ {
+-    switch (formatid)
++    switch (formatid) {
+     case 'IAC3':
+     case 'iac3':
+     case  kAudioFormat60958AC3:
+     case  kAudioFormatAC3:
++    case CA_FORMAT_EAC3:
++    case CA_FORMAT_TRUEHD:
+         return true;
++    }
+     return false;
+ }
+ 
+-// This might be wrong, but for now it's sufficient for us.
++// Group compatible formats together for matching
+ static uint32_t ca_normalize_formatid(uint32_t formatID)
+ {
+-    return ca_formatid_is_compressed(formatID) ? kAudioFormat60958AC3 : formatID;
++    switch (formatID) {
++    case 'IAC3':
++    case 'iac3':
++    case kAudioFormat60958AC3:
++    case kAudioFormatAC3:
++        return kAudioFormat60958AC3;
++    default:
++        return formatID;
++    }
+ }
+ 
+ bool ca_asbd_equals(const AudioStreamBasicDescription *a,
+-- 
+2.54.0 (Apple Git-157)
+
