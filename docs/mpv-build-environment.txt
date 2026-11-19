@@ -1,0 +1,227 @@
+ATMOS PLAYER v2.1 - MPV BUILD ENVIRONMENT
+========================================
+
+Upstream mpv commit:
+ecd5469c42f7aee53745679a98e2bbe89a3e8b14
+
+Complete source patch:
+Patches/mpv-complete-atmos-dtsx.patch
+
+Original build directory:
+build-dtsx (original local path omitted)
+
+========== BUILD OPTIONS ==========
+aaudio = auto
+alsa = auto
+amf = auto
+android-media-ndk = auto
+audiotrack = auto
+audiounit = auto
+auto_features = auto
+avfoundation = auto
+b_asneeded = True
+b_bitcode = False
+b_colorout = always
+b_coverage = False
+b_lto = False
+b_lto_mode = default
+b_lto_threads = 0
+b_lundef = False
+b_ndebug = false
+b_pch = True
+b_pgo = off
+b_pie = False
+b_sanitize = []
+b_staticpic = True
+b_thinlto_cache = False
+b_thinlto_cache_dir =
+backend = ninja
+backend_max_links = 16
+bindir = bin
+build-date = True
+buildtype = debugoptimized
+c_args = []
+c_link_args = []
+c_std = c11
+caca = auto
+cdda = auto
+cmake_prefix_path = []
+cocoa = auto
+coreaudio = auto
+cplayer = True
+cplugins = auto
+cuda-hwaccel = auto
+cuda-interop = auto
+d3d-hwaccel = auto
+d3d11 = auto
+d3d9-hwaccel = auto
+datadir = share
+debug = True
+default_both_libraries = shared
+default_library = shared
+direct3d = auto
+disable-packet-pool = False
+dmabuf-wayland = auto
+drm = auto
+dvbin = auto
+dvda = auto
+dvdnav = auto
+egl = auto
+egl-android = auto
+egl-angle = auto
+egl-angle-lib = auto
+egl-angle-win32 = auto
+egl-drm = auto
+egl-wayland = auto
+egl-x11 = auto
+errorlogs = True
+force_fallback_for = []
+fuzzers = False
+gbm = auto
+genvslite = vs2022
+gl = enabled
+gl-cocoa = auto
+gl-dxinterop = auto
+gl-dxinterop-d3d9 = auto
+gl-win32 = auto
+gl-x11 = disabled
+gpl = True
+html-build = disabled
+iconv = auto
+includedir = include
+infodir = share/info
+install_umask = 18
+ios-gl = auto
+jack = auto
+javascript = auto
+jpeg = auto
+layout = mirror
+lcms2 = auto
+libarchive = auto
+libavdevice = auto
+libbluray = auto
+libcurl = auto
+libdir = lib
+libexecdir = libexec
+libmpv = True
+licensedir =
+localedir = share/locale
+localstatedir = /opt/homebrew/var
+lua = auto
+macos-10-15-4-features = auto
+macos-11-3-features = auto
+macos-11-features = auto
+macos-12-features = auto
+macos-bundle-category = video
+macos-cocoa-cb = auto
+macos-media-player = auto
+macos-touchbar = auto
+mandir = share/man
+manpage-build = auto
+objc_args = []
+objc_link_args = []
+openal = disabled
+opensles = auto
+optimization = 2
+os2_emxomf = False
+oss-audio = auto
+pdf-build = disabled
+pipewire = auto
+pkg_config_path = ['$BUILD_PREFIX/lib/pkgconfig', '$BUILD_PREFIX/lib64/pkgconfig']
+pkgconfig.relocatable = False
+plain-gl = auto
+prefer_static = False
+prefix = /opt/homebrew
+pthread-debug = disabled
+pulse = auto
+python.allow_limited_api = True
+python.build_config =
+python.bytecompile = 0
+python.install_env = prefix
+python.platlibdir =
+python.purelibdir =
+rubberband = auto
+sbindir = sbin
+sdl2-audio = disabled
+sdl2-gamepad = disabled
+sdl2-video = disabled
+shaderc = auto
+sharedstatedir = /opt/homebrew/var/lib
+sixel = auto
+sndio = auto
+spirv-cross = auto
+stdsplit = True
+strip = False
+subrandr = auto
+swift-build = auto
+swift-flags =
+sysconfdir = etc
+tests = False
+uchardet = auto
+unity = off
+unity_size = 4
+uwp = disabled
+vaapi = auto
+vaapi-drm = auto
+vaapi-wayland = auto
+vaapi-win32 = auto
+vaapi-x11 = auto
+vapoursynth = auto
+vdpau = auto
+vdpau-gl-x11 = auto
+vector = auto
+videotoolbox-gl = auto
+videotoolbox-pl = auto
+vsenv = False
+vulkan = auto
+warning_level = 2
+wasapi = auto
+wayland = auto
+werror = False
+win32-smtc = auto
+win32-subsystem = windows
+win32-threads = auto
+wrap_mode = default
+x11 = auto
+x11-clipboard = auto
+xv = auto
+zimg = auto
+zlib = auto
+
+========== BUILD DEPENDENCIES ==========
+libavcodec | version=63.1.102 | type=pkgconfig
+libavfilter | version=12.1.102 | type=pkgconfig
+libavformat | version=63.1.102 | type=pkgconfig
+libavutil | version=61.1.102 | type=pkgconfig
+libswresample | version=7.1.102 | type=pkgconfig
+libswscale | version=10.1.102 | type=pkgconfig
+libplacebo | version=7.387.0 | type=pkgconfig
+libass | version=0.17.5 | type=pkgconfig
+dl | version=unknown | type=builtin
+threads | version=unknown | type=system
+appleframeworks | version=unknown | type=appleframeworks
+libcurl | version=8.7.1 | type=pkgconfig
+iconv | version=unknown | type=system
+mujs | version=1.3.11 | type=pkgconfig
+lcms2 | version=2.20 | type=pkgconfig
+libavdevice | version=63.1.102 | type=pkgconfig
+libbluray | version=1.5.0 | type=pkgconfig
+luajit | version=2.1.1794386141 | type=pkgconfig
+rubberband | version=4.0.0 | type=pkgconfig
+sdl2 | version=2.32.74 | type=pkgconfig
+uchardet | version=0.0.8 | type=pkgconfig
+vapoursynth | version=82 | type=pkgconfig
+x11 | version=1.8.14 | type=pkgconfig
+zimg | version=3.0.6 | type=pkgconfig
+zlib | version=1.2.12 | type=pkgconfig
+libjpeg | version=3.2.1 | type=pkgconfig
+xext | version=1.3.7 | type=pkgconfig
+vulkan | version=1.4.363 | type=pkgconfig
+
+========== TOOL VERSIONS ==========
+1.12.1
+1.13.2
+Apple clang version 21.0.0 (clang-2100.4.1.1)
+Target: arm64-apple-darwin27.2.0
+Thread model: posix
+3.0.11
