@@ -124,7 +124,7 @@
  }
  
 -static la_ssize_t read_cb(struct archive *arch, void *priv, const void **buffer)
-+static ssize_t read_cb(struct archive *arch, void *priv, const void **buffer)
++static la_ssize_t read_cb(struct archive *arch, void *priv, const void **buffer)
  {
      struct mp_archive_volume *vol = priv;
      if (!vol->src)
@@ -134,8 +134,8 @@
  // lazy seek to avoid problems with end seeking over http
 -static la_int64_t seek_cb(struct archive *arch, void *priv,
 -                          la_int64_t offset, int whence)
-+static int64_t seek_cb(struct archive *arch, void *priv,
-+                       int64_t offset, int whence)
++static la_int64_t seek_cb(struct archive *arch, void *priv,
++                       la_int64_t offset, int whence)
  {
      struct mp_archive_volume *vol = priv;
      if (!vol->src)
@@ -144,7 +144,7 @@
          int64_t size = stream_get_size(vol->src);
          if (size < 0)
 -            return ARCHIVE_FAILED;
-+            return -1;
++            return ARCHIVE_FAILED;
          vol->seek_to = size + offset;
          break;
      default:
@@ -155,7 +155,7 @@
  }
  
 -static la_int64_t skip_cb(struct archive *arch, void *priv, la_int64_t request)
-+static int64_t skip_cb(struct archive *arch, void *priv, int64_t request)
++static la_int64_t skip_cb(struct archive *arch, void *priv, la_int64_t request)
  {
      struct mp_archive_volume *vol = priv;
      if (!vol->src)
@@ -164,7 +164,8 @@
          return -1;
      int64_t old = stream_tell(vol->src);
 -    request = MPMIN(request, INT64_MAX - old);
-     stream_seek_skip(vol->src, old + request);
+     request = MPMIN(request, INT64_MAX - old);
+    stream_seek_skip(vol->src, old + request);
      return stream_tell(vol->src) - old;
  }
 @@ -462,6 +461,7 @@
@@ -192,7 +193,7 @@
      if (p->mpa && !p->broken_seek) {
          locale_t oldlocale = uselocale(p->mpa->locale);
 -        la_int64_t r = archive_seek_data(p->mpa->arch, newpos, SEEK_SET);
-+        int r = archive_seek_data(p->mpa->arch, newpos, SEEK_SET);
++        la_int64_t r = archive_seek_data(p->mpa->arch, newpos, SEEK_SET);
          uselocale(oldlocale);
          if (r >= 0)
              return 1;
@@ -237,7 +238,7 @@
 +
 +            int size = MPMIN(newpos - s->pos, sizeof(buffer));
 +            locale_t oldlocale = uselocale(p->mpa->locale);
-+            int r = archive_read_data(p->mpa->arch, buffer, size);
++            la_ssize_t r = archive_read_data(p->mpa->arch, buffer, size);
 +            if (r <= 0) {
 +                if (r == 0 && newpos > p->entry_size) {
 +                    MP_ERR(s, "demuxer trying to seek beyond end of archive "
