@@ -17,17 +17,17 @@ Collected source archive:
 The archive is supplied in the separate source-release package.
 Alternatively, retrieve the exact upstream commit listed above.
 
-## Complete custom patch
+## Corrected custom patch
 
-../patches/mpv-complete-atmos-dtsx.patch
+../patches/mpv-atmos-dtsx-corrected.patch
 
 The patch modifies:
 - audio/out/ao_coreaudio_exclusive.c
 - audio/out/ao_coreaudio_utils.c
-- stream/stream_libarchive.c
 
-The complete patch was previously verified to reconstruct
-the three modified source files byte-for-byte.
+The corrected patch was independently verified against the exact
+upstream baseline. It modifies only the two CoreAudio files listed
+above. The archive-stream implementation remains unchanged.
 
 ## Original build environment
 
@@ -66,7 +66,7 @@ new directory.
 
 Apply the complete patch from that source directory:
 
-    git apply /path/to/mpv-complete-atmos-dtsx.patch
+    git apply /path/to/mpv-atmos-dtsx-corrected.patch
 
 Alternatively, retrieve the exact upstream Git commit
 and apply the same patch.
@@ -103,3 +103,38 @@ Original build settings recovered: YES
 Bundled mpv compiled-code match: YES
 Clean reproducible rebuild: NOT YET VERIFIED
 Public redistribution compliance: NOT YET VERIFIED
+
+## Authoritative corrected release patch
+
+Use only:
+
+patches/mpv-atmos-dtsx-corrected.patch
+
+SHA256:
+
+e3f3af75f508de2b0d828ce29cfd6d7ba5f7e559eeb14357154d3a06f6552f53
+
+Upstream baseline:
+
+ecd5469c42f7aee53745679a98e2bbe89a3e8b14
+
+Modified files:
+
+- audio/out/ao_coreaudio_exclusive.c
+- audio/out/ao_coreaudio_utils.c
+
+The corrected patch was independently verified against a clean
+export of the upstream baseline.
+
+The upstream stream/stream_libarchive.c implementation is unchanged.
+
+Historical development patches retained for provenance only:
+
+- mpv-complete-atmos-dtsx.patch
+- 0001-coreaudio-truehd-eac3-passthrough.patch
+
+Do not apply either historical patch when reconstructing the
+corrected source release.
+
+A fresh build and playback test using the corrected patch
+have not yet been verified.

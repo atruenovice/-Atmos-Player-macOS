@@ -1,0 +1,122 @@
+diff --git a/audio/out/ao_coreaudio_exclusive.c b/audio/out/ao_coreaudio_exclusive.c
+index 6dac7c0..6f6def5 100644
+--- a/audio/out/ao_coreaudio_exclusive.c
++++ b/audio/out/ao_coreaudio_exclusive.c
+@@ -337,8 +337,10 @@ static int init(struct ao *ao)
+     // virtual format.
+     ca_change_physical_format_sync(ao, p->stream, hwfmt);
+ 
+-    if (!ca_init_chmap(ao, p->device))
+-        goto coreaudio_error;
++    if (!af_fmt_is_spdif(ao->format)) {
++        if (!ca_init_chmap(ao, p->device))
++            goto coreaudio_error;
++    }
+ 
+     err = CA_GET(p->stream, kAudioStreamPropertyVirtualFormat, &p->stream_asbd);
+     CHECK_CA_ERROR("could not get stream's virtual format");
+@@ -363,11 +365,16 @@ static int init(struct ao *ao)
+         goto coreaudio_error;
+     }
+ 
+-    ao->samplerate = p->stream_asbd.mSampleRate;
++    if (af_fmt_is_spdif(ao->format)) {
++        ao->samplerate = p->stream_asbd.mSampleRate *
++                         p->stream_asbd.mChannelsPerFrame / ao->channels.num;
++    } else {
++        ao->samplerate = p->stream_asbd.mSampleRate;
+ 
+-    if (ao->channels.num != p->stream_asbd.mChannelsPerFrame) {
+-        ca_get_active_chmap(ao, p->device, p->stream_asbd.mChannelsPerFrame,
+-                            &ao->channels);
++        if (ao->channels.num != p->stream_asbd.mChannelsPerFrame) {
++            ca_get_active_chmap(ao, p->device, p->stream_asbd.mChannelsPerFrame,
++                                &ao->channels);
++        }
+     }
+     if (!ao->channels.num) {
+         MP_ERR(ao, "number of channels changed, and unknown channel layout!\n");
+diff --git a/audio/out/ao_coreaudio_utils.c b/audio/out/ao_coreaudio_utils.c
+index 8ff76a8..909e6b8 100644
+--- a/audio/out/ao_coreaudio_utils.c
++++ b/audio/out/ao_coreaudio_utils.c
+@@ -144,19 +144,38 @@ bool check_ca_st(struct ao *ao, int level, OSStatus code, const char *message)
+     return false;
+ }
+ 
++// Compressed stream format FourCCs exposed by macOS HDMI drivers.
++// Not present in Apple SDK headers.
++#define CA_FORMAT_EAC3            'cc+3' // E-AC-3 / Dolby Digital Plus
++#define CA_FORMAT_TRUEHD          'mtc+' // Dolby TrueHD / MAT 2.0
++#define CA_FORMAT_DTSHD 'mtct' // Experimental: unverified HDMI format
++
+ static void ca_fill_asbd_raw(AudioStreamBasicDescription *asbd, int mp_format,
+                              int samplerate, int num_channels)
+ {
+     asbd->mSampleRate       = samplerate;
+-    // Set "AC3" for other spdif formats too - unknown if that works.
+-    asbd->mFormatID         = af_fmt_is_spdif(mp_format) ?
+-                              kAudioFormat60958AC3 :
+-                              kAudioFormatLinearPCM;
+-    asbd->mChannelsPerFrame = num_channels;
++    if (af_fmt_is_spdif(mp_format)) {
++        // CoreAudio expects the IEC60958 frame rate (samplerate * num_channels / 2)
++        asbd->mSampleRate       = (double)samplerate * num_channels / 2;
++        asbd->mChannelsPerFrame = 2;
++
++        if (mp_format == AF_FORMAT_S_TRUEHD) {
++            asbd->mFormatID     = CA_FORMAT_TRUEHD;
++        } else if (mp_format == AF_FORMAT_S_EAC3) {
++            asbd->mFormatID     = CA_FORMAT_EAC3;
++        } else if (mp_format == AF_FORMAT_S_DTSHD) {
++            asbd->mFormatID     = CA_FORMAT_DTSHD;
++        } else {
++            asbd->mFormatID     = kAudioFormat60958AC3;
++        }
++    } else {
++        asbd->mFormatID         = kAudioFormatLinearPCM;
++        asbd->mChannelsPerFrame = num_channels;
++    }
+     asbd->mBitsPerChannel   = af_fmt_to_bytes(mp_format) * 8;
+     asbd->mFormatFlags      = kAudioFormatFlagIsPacked;
+ 
+-    int channels_per_buffer = num_channels;
++    int channels_per_buffer = asbd->mChannelsPerFrame;
+     if (af_fmt_is_planar(mp_format)) {
+         asbd->mFormatFlags |= kAudioFormatFlagIsNonInterleaved;
+         channels_per_buffer = 1;
+@@ -184,19 +203,31 @@ void ca_fill_asbd(struct ao *ao, AudioStreamBasicDescription *asbd)
+ 
+ bool ca_formatid_is_compressed(uint32_t formatid)
+ {
+-    switch (formatid)
++    switch (formatid) {
+     case 'IAC3':
+     case 'iac3':
+     case  kAudioFormat60958AC3:
+     case  kAudioFormatAC3:
++    case CA_FORMAT_EAC3:
++    case CA_FORMAT_TRUEHD:
++    case CA_FORMAT_DTSHD:
+         return true;
++    }
+     return false;
+ }
+ 
+-// This might be wrong, but for now it's sufficient for us.
++// Group compatible formats together for matching
+ static uint32_t ca_normalize_formatid(uint32_t formatID)
+ {
+-    return ca_formatid_is_compressed(formatID) ? kAudioFormat60958AC3 : formatID;
++    switch (formatID) {
++    case 'IAC3':
++    case 'iac3':
++    case kAudioFormat60958AC3:
++    case kAudioFormatAC3:
++        return kAudioFormat60958AC3;
++    default:
++        return formatID;
++    }
+ }
+ 
+ bool ca_asbd_equals(const AudioStreamBasicDescription *a,
