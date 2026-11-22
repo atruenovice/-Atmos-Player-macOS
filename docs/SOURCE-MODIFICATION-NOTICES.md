@@ -90,5 +90,9 @@ from the upstream baseline.
 Historical overlapping development patches must not be applied
 alongside the corrected patch.
 
-A clean rebuild and playback verification using the corrected patch
-remain outstanding.
+The corrected mpv and FFmpeg patches have passed isolated
+application tests against the archived upstream sources.
+A clean rebuild from those patches remains unverified.
+Previously successful application playback tests do not by
+themselves prove that the distributed binaries were built
+from these exact archived sources and patches.

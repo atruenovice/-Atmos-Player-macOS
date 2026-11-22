@@ -37,7 +37,7 @@ The minimum supported macOS version has not yet been established.
 
 1. Download the portable ZIP from the GitHub Releases page.
 2. Extract the ZIP archive.
-3. Move `Atmos Player v2.app` to your preferred location.
+3. Move `Atmos Player v2.2.app` to your preferred location.
 4. Drag a compatible movie file onto the application icon.
 
 See [Installation Guide](docs/INSTALLATION.md) for detailed instructions, including macOS security approval.
