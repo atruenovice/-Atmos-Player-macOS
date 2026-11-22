@@ -82,3 +82,7 @@ Atmos Player is an independent experimental project.
 It is not affiliated with or endorsed by Dolby Laboratories, Apple Inc., or the mpv project.
 
 Dolby, Dolby Atmos and related trademarks belong to their respective owners.
+
+## Audio Compatibility
+
+See [Supported Audio Formats and HDMI Passthrough](docs/AUDIO-COMPATIBILITY.md) for verified formats, receiver requirements, and troubleshooting.
